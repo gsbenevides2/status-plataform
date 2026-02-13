@@ -12,6 +12,7 @@ export async function fetchFromGenericHttp(
 	try {
 		const response = await axios.get(endpoint, {
 			validateStatus: () => true,
+			timeout: 10000,
 		});
 
 		if (response.status === 200) {
@@ -28,9 +29,7 @@ export async function fetchFromGenericHttp(
 		let problemDescription = "Unknown error occurred";
 
 		if (axios.isAxiosError(error)) {
-			if (error.response) {
-				problemDescription = `HTTP status code ${error.response.status} received instead of 200`;
-			} else if (error.request) {
+			if (error.request) {
 				problemDescription = "No response received from the endpoint";
 			} else {
 				problemDescription = error.message;
