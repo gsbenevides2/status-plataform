@@ -29,7 +29,9 @@ export async function fetchFromGenericHttp(
 		let problemDescription = "Unknown error occurred";
 
 		if (axios.isAxiosError(error)) {
-			if (error.request) {
+			if (error.code === "ECONNABORTED") {
+				problemDescription = "Request timed out after 10 seconds";
+			} else if (error.request) {
 				problemDescription = "No response received from the endpoint";
 			} else {
 				problemDescription = error.message;
