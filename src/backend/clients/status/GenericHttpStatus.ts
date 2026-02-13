@@ -10,7 +10,9 @@ export async function fetchFromGenericHttp(
 	endpoint: string,
 ): Promise<StatusReturn> {
 	try {
-		const response = await axios.get(endpoint);
+		const response = await axios.get(endpoint, {
+			validateStatus: () => true,
+		});
 
 		if (response.status === 200) {
 			return {
