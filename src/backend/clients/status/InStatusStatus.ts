@@ -23,7 +23,7 @@ export async function fetchFromInstatusStatuspage(
 	const url = `https://${enpointUrl.host}/summary.json`;
 	const response = await axios.get<AtlassianStatusResponse>(url);
 	const isDown =
-		response.data.page.status === "HASISSUES" ||
+		response.data.page.status === "HASISSUES" &&
 		(response.data.activeIncidents && response.data.activeIncidents.length > 0);
 
 	if (isDown) {

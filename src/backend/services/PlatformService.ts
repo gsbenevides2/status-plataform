@@ -50,7 +50,6 @@ export class PlatformService {
 				return fetcher(platform.url);
 			}),
 		);
-		console.log("status", status);
 		return status
 			.map((result, index) => {
 				const platform = platforms[index];
