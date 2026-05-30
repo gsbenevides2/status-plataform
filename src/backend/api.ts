@@ -11,8 +11,9 @@ const api = new Elysia({
 			return;
 		}
 
-		// Regra: se a variável de senha estiver indisponível, acesso livre.
-		if (!AuthService.password) {
+		// Regra: se a variável de senha estiver indisponível (undefined/null), acesso livre.
+		// Importante: "" (string vazia) deve ser tratado como valor declarado, não como ausência.
+		if (AuthService.password === undefined || AuthService.password === null) {
 			return;
 		}
 

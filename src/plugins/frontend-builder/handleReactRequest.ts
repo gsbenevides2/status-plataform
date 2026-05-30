@@ -28,8 +28,9 @@ export async function handleReactRequest(request: Request) {
 		.filter((data) => data !== null)[0];
 
 	if (data?.protected) {
-		// Regra: se a variável de senha estiver indisponível, acesso livre.
-		if (!AuthService.password) {
+		// Regra: se a variável de senha estiver indisponível (undefined/null), acesso livre.
+		// Importante: "" (string vazia) deve ser tratado como valor declarado, não como ausência.
+		if (AuthService.password === undefined || AuthService.password === null) {
 			// libera sem redirecionar
 		} else {
 			const cookies = new Bun.CookieMap(request.headers.get("cookie") ?? "");
