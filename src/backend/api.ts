@@ -7,6 +7,7 @@ const api = new Elysia({
 	prefix: "/api",
 })
 	.onBeforeHandle(async ({ cookie, status, route, headers }) => {
+	.onBeforeHandle(async ({ cookie, status, route, headers }) => {
 		if (route.startsWith("/api/auth")) {
 			return;
 		}
@@ -15,7 +16,6 @@ const api = new Elysia({
 		// o app deve ficar em modo "acesso livre".
 		if (!AuthService.isAuthEnabled()) {
 			return;
-		}
 		}
 
 		const inHeader = headers.authorization;
@@ -40,7 +40,7 @@ const api = new Elysia({
 				error: "Unauthorized",
 			});
 		}
-
+	})
 	})
 	.use(AuthController)
 	.use(PlatformController);

@@ -28,7 +28,7 @@ export async function handleReactRequest(request: Request) {
 		.filter((data) => data !== null)[0];
 
 	if (data?.protected) {
-		// Regra: se as variáveis de autenticação não estiverem completas (undefined/null),
+		// Regra: se as variáveis de autenticação não estiverem completas,
 		// o app deve ficar em modo "acesso livre".
 		if (!AuthService.isAuthEnabled()) {
 			// libera sem redirecionar
