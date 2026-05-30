@@ -1,6 +1,5 @@
 import crypto from "node:crypto";
 import * as jose from "jose";
-import { getEnv } from "../../utils/getEnv";
 
 export class InvalidCredentialsError extends Error {
 	constructor(message: string) {
@@ -9,13 +8,26 @@ export class InvalidCredentialsError extends Error {
 	}
 }
 
+function isNonEmptyString(v: unknown): v is string {
+	return typeof v === "string" && v.trim().length > 0;
+}
+
 export class AuthService {
 	token: string | null = null;
-	static username = getEnv("AUTH_USERNAME");
-	// Se AUTH_PASSWORD estiver ausente/vazio, o acesso deve ficar livre (fallback). 
+	// Variáveis de login: se qualquer uma delas não estiver definida,
+	// o app deve ficar em modo "acesso livre".
+	static username = Bun.env.AUTH_USERNAME;
 	static password = Bun.env.AUTH_PASSWORD;
-	static secret = getEnv("AUTH_SECRET");
+	static secret = Bun.env.AUTH_SECRET;
 	static sessionId: string | null = null;
+
+	static isAuthEnabled(): boolean {
+		return (
+			isNonEmptyString(AuthService.username) &&
+			isNonEmptyString(AuthService.password) &&
+			isNonEmptyString(AuthService.secret)
+		);
+	}
 
 	static generateUniqueSessionId() {
 		AuthService.sessionId = crypto.randomBytes(32).toString("hex");

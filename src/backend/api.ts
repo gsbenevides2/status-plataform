@@ -7,13 +7,14 @@ const api = new Elysia({
 	prefix: "/api",
 })
 	.onBeforeHandle(async ({ cookie, status, route, headers }) => {
+	.onBeforeHandle(async ({ cookie, status, route, headers }) => {
 		if (route.startsWith("/api/auth")) {
 			return;
 		}
 
-		// Regra: se a variável de senha estiver indisponível (undefined/null), acesso livre.
-		// Importante: "" (string vazia) deve ser tratado como valor declarado, não como ausência.
-		if (AuthService.password === undefined || AuthService.password === null) {
+		// Regra: se as variáveis de autenticação não estiverem completas (undefined/null),
+		// o app deve ficar em modo "acesso livre".
+		if (!AuthService.isAuthEnabled()) {
 			return;
 		}
 
@@ -39,7 +40,7 @@ const api = new Elysia({
 				error: "Unauthorized",
 			});
 		}
-
+	})
 	})
 	.use(AuthController)
 	.use(PlatformController);
