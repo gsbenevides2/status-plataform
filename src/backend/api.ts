@@ -16,6 +16,7 @@ const api = new Elysia({
 		if (!AuthService.isAuthEnabled()) {
 			return;
 		}
+		}
 
 		const inHeader = headers.authorization;
 		if (inHeader) {
