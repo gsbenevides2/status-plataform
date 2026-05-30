@@ -10,7 +10,6 @@ import { staticRouterHandler } from "../../frontend/router/staticHandler";
 
 export async function handleReactRequest(request: Request) {
 	const { query } = staticRouterHandler;
-
 	const context = await query(request);
 	if (context instanceof Response) {
 		return context;
@@ -27,34 +26,31 @@ export async function handleReactRequest(request: Request) {
 		})
 		.filter((data) => data !== null)[0];
 
-	if (data?.protected) {
-		// Regra: o app sai do modo "acesso livre" apenas quando
-		// as variáveis de autenticação forem **strings não-vazias**.
+	if (data?.protected && AuthService.isAuthEnabled()) {
+		// Regra: o app protege as rotas somente quando as variáveis de autenticação
+		// forem **strings não-vazias**.
 		// A função determinante é `isNonEmptyString` (usada em `AuthService.isAuthEnabled()`):
 		// strings vazias ("" ) são tratadas como **não declaradas**.
-		if (!AuthService.isAuthEnabled()) {
-			// libera sem redirecionar
-		} else {
-			const cookies = new Bun.CookieMap(request.headers.get("cookie") ?? "");
-			const token = cookies.get("token");
-			if (!token) {
-				return new Response(null, {
-					status: 302,
-					headers: {
-						Location: "/login",
-					},
-				});
-			}
-			const decoded = await AuthService.verify(token);
-			if (!decoded || decoded instanceof InvalidCredentialsError) {
-				return new Response(null, {
-					status: 302,
-					headers: {
-						Location: "/login",
-						"Set-Cookie": `token=; Max-Age=0; Path=/; HttpOnly; SameSite=Strict`,
-					},
-				});
-			}
+
+		const cookies = new Bun.CookieMap(request.headers.get("cookie") ?? "");
+		const token = cookies.get("token");
+		if (!token) {
+			return new Response(null, {
+				status: 302,
+				headers: {
+					Location: "/login",
+				},
+			});
+		}
+		const decoded = await AuthService.verify(token);
+		if (!decoded || decoded instanceof InvalidCredentialsError) {
+			return new Response(null, {
+				status: 302,
+				headers: {
+					Location: "/login",
+					"Set-Cookie": `token=; Max-Age=0; Path=/; HttpOnly; SameSite=Strict`,
+				},
+			});
 		}
 	}
 
@@ -65,9 +61,8 @@ export async function handleReactRequest(request: Request) {
 		}),
 		{
 			bootstrapScripts: ["index.js"],
-		},
+		}
 	);
-
 	return new Response(stream, {
 		headers: {
 			"Content-Type": "text/html",
