@@ -28,25 +28,30 @@ export async function handleReactRequest(request: Request) {
 		.filter((data) => data !== null)[0];
 
 	if (data?.protected) {
-		const cookies = new Bun.CookieMap(request.headers.get("cookie") ?? "");
-		const token = cookies.get("token");
-		if (!token) {
-			return new Response(null, {
-				status: 302,
-				headers: {
-					Location: "/login",
-				},
-			});
-		}
-		const decoded = await AuthService.verify(token);
-		if (!decoded || decoded instanceof InvalidCredentialsError) {
-			return new Response(null, {
-				status: 302,
-				headers: {
-					Location: "/login",
-					"Set-Cookie": `token=; Max-Age=0; Path=/; HttpOnly; SameSite=Strict`,
-				},
-			});
+		// Regra: se a variável de senha estiver indisponível, acesso livre.
+		if (!AuthService.password) {
+			// libera sem redirecionar
+		} else {
+			const cookies = new Bun.CookieMap(request.headers.get("cookie") ?? "");
+			const token = cookies.get("token");
+			if (!token) {
+				return new Response(null, {
+					status: 302,
+					headers: {
+						Location: "/login",
+					},
+				});
+			}
+			const decoded = await AuthService.verify(token);
+			if (!decoded || decoded instanceof InvalidCredentialsError) {
+				return new Response(null, {
+					status: 302,
+					headers: {
+						Location: "/login",
+						"Set-Cookie": `token=; Max-Age=0; Path=/; HttpOnly; SameSite=Strict`,
+					},
+				});
+			}
 		}
 	}
 

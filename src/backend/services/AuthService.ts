@@ -12,7 +12,8 @@ export class InvalidCredentialsError extends Error {
 export class AuthService {
 	token: string | null = null;
 	static username = getEnv("AUTH_USERNAME");
-	static password = getEnv("AUTH_PASSWORD");
+	// Se AUTH_PASSWORD estiver ausente/vazio, o acesso deve ficar livre (fallback). 
+	static password = Bun.env.AUTH_PASSWORD;
 	static secret = getEnv("AUTH_SECRET");
 	static sessionId: string | null = null;
 
